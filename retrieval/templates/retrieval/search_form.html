@@ -1,0 +1,20 @@
+{% extends 'retrieval/base.html' %}
+
+{% block content %}
+    <h1>Search anything</h1>
+    <form action="/search/" method="get" class="post-form">{% csrf_token %}
+        <input type="text" name="q">
+        <input type="submit" value="Search">
+    </form>
+
+    <h3>Added tracks</h3>
+    {% for track in tracks %}
+        <div class="post">
+            <div class="date">
+                {{ track.name }}
+            </div>
+            <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ track.preview_url }}</a></h1>
+            <p>{{ track.artist|linebreaksbr }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

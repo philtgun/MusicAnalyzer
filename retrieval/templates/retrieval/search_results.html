@@ -1,0 +1,18 @@
+{% extends 'retrieval/base.html' %}
+
+{% block content %}
+    <p>You searched for: <strong>{{ query }}</strong></p>
+
+        {% if tracks %}
+            {% for track in tracks %}
+                <a href="{% url 'add_track' id=track.id %}" type="button"><button type="button">add</button></a>
+                <p>{{ track.name }} </p>
+                <p>{{ track.id }} </p>
+                <p>{{ track.album.name }} </p>
+                <p>{{ track.preview_url }}</p>
+            {% endfor %}
+
+        {% else %}           
+            <p>No books matched your search criteria.</p>       
+        {% endif %}
+{% endblock %}
