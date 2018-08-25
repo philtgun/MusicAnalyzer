@@ -57,7 +57,7 @@ def add_track(request, id):
     track.track_name = selected_track['name']
     track.artist = selected_track['artists'][0]['name']
     track.uri = 'spotify:track:' + id
-    track.id = id
+    track.track_id = id
     track.preview_url = selected_track['preview_url']
     track.created_date = timezone.now()
     track.save()
@@ -74,3 +74,15 @@ def track_info(request, id):
     features = spotify.audio_features([current_track.uri])
     print (features)
     return render(request, 'retrieval/track_info.html', {'current_track':current_track, 'features': features})
+
+
+def analyize_features(request):
+    all_tracks = Track.objects.all()
+    print (all_tracks)
+    all_track_ids = []
+    for track in all_tracks:
+        all_track_ids.append(track.uri)
+    
+    all_features = spotify.audio_features(all_track_ids)
+
+    return render(request, 'retrieval/analyze_features.html', {'all_features': all_features})

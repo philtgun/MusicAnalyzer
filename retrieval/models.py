@@ -8,6 +8,7 @@ class Track(models.Model):
     uri = models.CharField(max_length=50)
     preview_url = models.CharField(max_length=500, null=True)
     created_date = models.DateTimeField(default=timezone.now) 
+    track_id = models.CharField(max_length=50)
 
     def __str__(self):
         return self.track_name
