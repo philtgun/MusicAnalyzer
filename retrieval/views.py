@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect 
 from django.http import HttpResponse
+from django.utils import timezone
 
 import spotipy
 import sys
@@ -14,8 +15,8 @@ spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 # Create your views here.
 def search_form(request):
-    tracks = Track.objects.order_by('created_date')
-    return render(request, 'retrieval/search_form.html', {'tracks': tracks})
+    mytracks = Track.objects.order_by('created_date')
+    return render(request, 'retrieval/search_form.html', {'mytracks': mytracks})
 
 
 def search(request):
@@ -38,8 +39,9 @@ def search(request):
             pprint.pprint (result[i]['album']['name'])
         '''
 
+        mytracks = Track.objects.order_by('created_date')
 
-        return render(request, 'retrieval/search_results.html', {'tracks':tracks, 'query':q})
+        return render(request, 'retrieval/search_results.html', {'mytracks':mytracks, 'tracks':tracks, 'query':q})
         
     else :
         message = 'You submitted empty form'
@@ -48,5 +50,27 @@ def search(request):
 
 
 def add_track(request, id):
-    print (id)
-    return HttpResponse("hello")
+    # analysis = spotify.audio_features('spotify:track:' + id)
+    # print (analysis)
+    selected_track = spotify.track('spotify:track:' + id)
+    track = Track()
+    track.track_name = selected_track['name']
+    track.artist = selected_track['artists'][0]['name']
+    track.uri = 'spotify:track:' + id
+    track.id = id
+    track.preview_url = selected_track['preview_url']
+    track.created_date = timezone.now()
+    track.save()
+
+    return redirect('search_form')
+
+
+def delete_track(request, id):
+    deleting_track = Track.objects.get(pk=id).delete()
+    return redirect('search_form')
+
+def track_info(request, id):
+    current_track = Track.objects.get(pk=id)
+    features = spotify.audio_features([current_track.uri])
+    print (features)
+    return render(request, 'retrieval/track_info.html', {'current_track':current_track, 'features': features})

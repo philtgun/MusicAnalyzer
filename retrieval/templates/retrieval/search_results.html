@@ -1,6 +1,6 @@
-{% extends 'retrieval/base.html' %}
+{% extends 'retrieval/search_form.html' %}
 
-{% block content %}
+{% block result %}
     <p>You searched for: <strong>{{ query }}</strong></p>
 
         {% if tracks %}
@@ -10,6 +10,7 @@
                 <p>{{ track.id }} </p>
                 <p>{{ track.album.name }} </p>
                 <p>{{ track.preview_url }}</p>
+                <p>{{ track.artists.0.name }}</p>
             {% endfor %}
 
         {% else %}           

@@ -1,20 +1,29 @@
 {% extends 'retrieval/base.html' %}
 
 {% block content %}
-    <h1>Search anything</h1>
-    <form action="/search/" method="get" class="post-form">{% csrf_token %}
-        <input type="text" name="q">
-        <input type="submit" value="Search">
-    </form>
+    <div class="row">
+        <div class="col-sm-8">
+            <h1>Search anything</h1>
+            <form action="/search/" method="get" class="post-form">{% csrf_token %}
+                <input type="text" name="q">
+                <input type="submit" value="Search">
+            </form>
 
-    <h3>Added tracks</h3>
-    {% for track in tracks %}
-        <div class="post">
-            <div class="date">
-                {{ track.name }}
-            </div>
-            <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ track.preview_url }}</a></h1>
-            <p>{{ track.artist|linebreaksbr }}</p>
+            {% block result %}
+            {% endblock %}
         </div>
-    {% endfor %}
+        <div class="col-sm-4">
+            {% for mytrack in mytracks %}
+            <div class="post">
+
+                <a href="{% url 'delete_track' id=mytrack.id %}" type="button"><button type="button">delete</button></a>
+                <p><a href="{% url 'track_info' id=mytrack.id %}">{{ mytrack.track_name }}</a></p>
+                <p>{{ mytrack.artist|linebreaksbr }}</p>
+            </div>
+
+            {% endfor %}
+        </div>
+
+    </div>
+
 {% endblock %}
