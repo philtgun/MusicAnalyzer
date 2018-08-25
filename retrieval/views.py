@@ -2,18 +2,23 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.utils import timezone
 
-import spotipy
 import sys
-import pprint
+from urllib.request import urlretrieve, urlopen
+import librosa
+import soundfile as sf 
+import io
+from bs4 import BeautifulSoup
+import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 from .models import Track
 
+# spotify credentials 
 client_credentials_manager = SpotifyClientCredentials(client_id='34ac9f95d773412c8a2fabd9bef03ebc',
                                                       client_secret='7c0022360e334a89b7a0f098cc0a99cc')
 spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-# Create your views here.
+
 def search_form(request):
     mytracks = Track.objects.order_by('created_date')
     return render(request, 'retrieval/search_form.html', {'mytracks': mytracks})
@@ -29,7 +34,6 @@ def search(request):
 
         tracks = spotify.search(q, type='track')['tracks']['items']
 
-        # pprint.pprint(result['tracks']['items'])
         '''
         for i in range(len(tracks)) : 
             pprint.pprint (result[i]['uri'])
@@ -72,13 +76,28 @@ def delete_track(request, id):
 def track_info(request, id):
     current_track = Track.objects.get(pk=id)
     features = spotify.audio_features([current_track.uri])
-    print (features)
-    return render(request, 'retrieval/track_info.html', {'current_track':current_track, 'features': features})
+
+    ''' load album image '''
+    track_url = "http://open.spotify.com/track/" + current_track.track_id 
+    track_page = urlopen(track_url)
+    soup = BeautifulSoup(track_page, 'html.parser')
+    track_img = soup.find('img', class_="cover")
+    
+    ''' download audio ''' 
+    audio_filename = current_track.preview_url.split("/")[-1].split("?")[0]
+    # print (current_track.preview_url)
+    # url = "http://tinyurl.com/shepard-risset"
+    # data, samplerate = sf.read(io.BytesIO(urlopen(url).read()))
+    # data, sr = sf.read(io.BytesIO(urlopen(current_track.preview_url).read()))
+    # urlretrieve(current_track.preview_url, audio_filename + ".wav")
+    # y, sr = librosa.load(audio_filename + '.wav', sr=22050)
+
+
+    return render(request, 'retrieval/track_info.html', {'current_track':current_track, 'features': features, 'img_src': track_img['src']})
 
 
 def analyize_features(request):
     all_tracks = Track.objects.all()
-    print (all_tracks)
     all_track_ids = []
     for track in all_tracks:
         all_track_ids.append(track.uri)

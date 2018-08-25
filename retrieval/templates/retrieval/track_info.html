@@ -2,8 +2,12 @@
 
 {% block content %}
 <div>
-    {{ current_track.track_name }}
-    {{ features }}
+    <h3>{{ current_track.track_name }}</h3>
+    <img src="{{ img_src }}" width="200", height="200">
+    <audio controls>
+        <source src="{{ current_track.preview_url }}" type="audio/mpeg">
+    </audio>
+    <p>{{ features }}</p>
 </div>
 {% endblock %}
 
