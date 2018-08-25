@@ -28,7 +28,7 @@ def search(request):
     if 'q' in request.GET and request.GET['q']: 
         q = request.GET['q']
 
-        result = spotify.search(q, type='track')
+        result = spotify.search(q, type='track', limit=30)
         tracks = result['tracks']
         print (len(result))
 
@@ -83,14 +83,19 @@ def track_info(request, id):
     soup = BeautifulSoup(track_page, 'html.parser')
     track_img = soup.find('img', class_="cover")
     
-    ''' download audio ''' 
-    audio_filename = current_track.preview_url.split("/")[-1].split("?")[0]
-    # print (current_track.preview_url)
-    # url = "http://tinyurl.com/shepard-risset"
-    # data, samplerate = sf.read(io.BytesIO(urlopen(url).read()))
-    # data, sr = sf.read(io.BytesIO(urlopen(current_track.preview_url).read()))
-    # urlretrieve(current_track.preview_url, audio_filename + ".wav")
-    # y, sr = librosa.load(audio_filename + '.wav', sr=22050)
+    ''' download audio '''
+    print ("url", current_track.preview_url) 
+    if current_track.preview_url:
+        audio_filename = current_track.preview_url.split("/")[-1].split("?")[0]
+        # print (current_track.preview_url)
+        # url = "http://tinyurl.com/shepard-risset"
+        # data, samplerate = sf.read(io.BytesIO(urlopen(url).read()))
+        # data, sr = sf.read(io.BytesIO(urlopen(current_track.preview_url).read()))
+
+        # urlretrieve(current_track.preview_url, audio_filename + ".wav")
+        # y, sr = librosa.load(audio_filename + '.wav', sr=22050)
+    else :
+        audio_filename = None
 
 
     return render(request, 'retrieval/track_info.html', {'current_track':current_track, 'features': features, 'img_src': track_img['src']})
