@@ -3,6 +3,14 @@
 
 {% block content %}
 <div>
-    {{ all_features }}
+<table>
+    {% for vector in data %}
+        <tr>
+            {% for value in vector %}
+                <td>{{value}}, </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
 </div>
 {% endblock %}

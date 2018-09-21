@@ -7,6 +7,7 @@ from urllib.request import urlretrieve, urlopen
 import librosa
 import soundfile as sf 
 import io
+import numpy as np
 from bs4 import BeautifulSoup
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -108,5 +109,32 @@ def analyize_features(request):
         all_track_ids.append(track.uri)
     
     all_features = spotify.audio_features(all_track_ids)
+    all_analysis = []
+    for track_id in all_track_ids:
+        all_analysis.append(spotify.audio_analysis(track_id))
 
-    return render(request, 'retrieval/analyze_features.html', {'all_features': all_features})
+    features = []
+    feature_labels = ['danceability', 'energy', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness',
+              'liveness', 'valence', 'tempo']
+    segment_analysis_labels = ['pitches', 'timbre']
+
+    data = []
+    for track_features, track_analysis in zip(all_features, all_analysis):
+        feature_vector = []
+
+        for feature_label in feature_labels:
+            feature_vector.append(track_features[feature_label])
+        feature_vector = np.array(feature_vector)
+
+        analysis_vector = []
+        for segment in track_analysis['segments']:
+            analysis_vector_segment = []
+            for segment_analysis_label in segment_analysis_labels:
+                analysis_vector_segment += segment[segment_analysis_label]
+            analysis_vector.append(analysis_vector_segment)
+
+        analysis_vector = np.array(analysis_vector)
+        feature_vector = np.concatenate((feature_vector, analysis_vector.mean(axis=0)))
+        data.append(feature_vector)
+
+    return render(request, 'retrieval/analyze_features.html', {'data': data})

@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'MusicAnalyzer.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django_mongodb_engine',
+        'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'my_database'),
     }
 }

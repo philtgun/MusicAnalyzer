@@ -5,4 +5,6 @@ db.sqlite3
 static/
 .DS_Store
 *.wav
+my_database
+venv
 
