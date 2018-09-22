@@ -113,10 +113,16 @@ def analyize_features(request):
     for track_id in all_track_ids:
         all_analysis.append(spotify.audio_analysis(track_id))
 
-    features = []
-    feature_labels = ['danceability', 'energy', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness',
-              'liveness', 'valence', 'tempo']
-    segment_analysis_labels = ['pitches', 'timbre']
+    # feature_labels = ['danceability', 'energy', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness',
+    #                   'liveness', 'valence', 'tempo']
+    feature_labels = ['danceability', 'energy', 'mode', 'speechiness', 'acousticness', 'instrumentalness',
+                      'liveness', 'valence']
+
+    # segment_analysis_labels = ['pitches', 'timbre']
+    segment_analysis_labels = []
+    segment_analysis_total = 12
+
+    # gather data
 
     data = []
     for track_features, track_analysis in zip(all_features, all_analysis):
@@ -136,5 +142,26 @@ def analyize_features(request):
         analysis_vector = np.array(analysis_vector)
         feature_vector = np.concatenate((feature_vector, analysis_vector.mean(axis=0)))
         data.append(feature_vector)
+    data = np.array(data)
 
-    return render(request, 'retrieval/analyze_features.html', {'data': data})
+    # statistics
+
+    means = data.mean(axis=0)
+    vars = data.var(axis=0)
+    labels = feature_labels
+    for label in segment_analysis_labels:
+        for i in range(segment_analysis_total):
+            labels += ['{}.{}'.format(label, i)]
+    labels = np.array(labels)
+
+    var_indices_sorted = np.argsort(vars)
+
+    results = np.array(list(zip(labels, vars, means)))
+    print(results)
+
+    return render(request, 'retrieval/analyze_features.html', {
+        'results': results[var_indices_sorted],
+        'means': means[var_indices_sorted],
+        'vars': vars[var_indices_sorted],
+        'labels': labels[var_indices_sorted]
+    })

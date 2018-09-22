@@ -4,13 +4,20 @@
 {% block content %}
 <div>
 <table>
-    {% for vector in data %}
         <tr>
-            {% for value in vector %}
-                <td>{{value}}, </td>
-            {% endfor %}
+            <td>Feature</td>
+            <td>Variance</td>
+            <td>Mean</td>
+        </tr>
+    {% for label, var, mean in results %}
+        <tr>
+            <td>{{ label }}</td>
+            <td>{{ var|floatformat:-3 }}</td>
+            <td>{{ mean|floatformat:-3 }}</td>
         </tr>
     {% endfor %}
+
+
 </table>
 </div>
 {% endblock %}
